@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-
 /**
  * @version V1.0 <描述当前版本功能>
  * @FileName: ChivoxModule.java
@@ -66,7 +65,6 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
         workerThread.execute(new Runnable() {
             @Override
             public void run() {
-
                 if (getCurrentActivity() == null) {
                     return;
                 }
@@ -102,7 +100,7 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
         final String coreType = options.getString("coreType");
         final String refText = options.getString("refText");
         final int attachAudioUrl = options.getInt("attachAudioUrl");
-        if (getCurrentActivity() == null || TextUtils.isEmpty(coreType) || TextUtils.isEmpty(refText) || attachAudioUrl == 0) {
+        if (getCurrentActivity() == null || TextUtils.isEmpty(coreType) || TextUtils.isEmpty(refText) || mEngine == null) {
             promise.reject("0", "操作失败");
             return;
         }
