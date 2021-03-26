@@ -1,6 +1,5 @@
 package com.bookln.chivox;
 
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -30,14 +29,13 @@ import java.util.concurrent.Executors;
 
 /**
  * @version V1.0 <描述当前版本功能>
- * @FileName: UGBleModule.java
+ * @FileName: ChivoxModule.java
  * @author: villa_mou
  * @date: 05-14:43
  * @desc
  */
 @ReactModule(name = ChivoxModule.NAME)
 public class ChivoxModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
-
     public static final String NAME = "ChivoxModule";
     private static final String TAG = "villa";
     private ExecutorService workerThread = Executors.newFixedThreadPool(1);
@@ -205,7 +203,7 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
      */
     private void sendEvent(
             String eventName,
-            @Nullable WritableMap params) {
+            WritableMap params) {
         getReactApplicationContext()
                 .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
                 .emit(eventName, params);
