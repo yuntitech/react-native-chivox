@@ -15,7 +15,7 @@ export interface ChivoxRecordParam {
 export const getChivoxDataNotification =
   "cn.bookln.oneClickLogin.getChivoxDataNotification";
 
-class ImageCompressUtil {
+class ChivoxRecordUtil {
   /**
    * 初始化
    * @param appKey
@@ -42,4 +42,4 @@ class ImageCompressUtil {
   };
 }
 
-export const imageCompressUtil = new ImageCompressUtil();
+export const chivoxRecordUtil = new ChivoxRecordUtil();
