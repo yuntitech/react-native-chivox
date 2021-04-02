@@ -2,11 +2,20 @@ import { NativeModules, Platform } from "react-native";
 
 const { ChivoxModule } = NativeModules;
 
-/** 文件压缩参数 */
 export interface ChivoxRecordParam {
   coreType: string;
-  refText: string;
+  refText?: string;
   attachAudioUrl: number;
+  keywords?: string[];
+  rank?: number;
+  precision?: number;
+}
+export interface RecordAndRetellRefParam {
+  lm: LmParam[];
+}
+
+export interface LmParam {
+  text: string;
 }
 
 /**

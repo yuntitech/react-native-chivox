@@ -14,10 +14,11 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.module.annotations.ReactModule;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,10 +82,12 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
                         @Override
                         public void onSuccess(Engine engine) {
                             mEngine = engine;
+                            Log.e(TAG, "onSuccess");
                         }
 
                         @Override
                         public void onFail(RetValue err) {
+                            Log.e(TAG, "err" + err.error);
                         }
                     });
                 } catch (JSONException e) {
@@ -96,7 +99,8 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
     }
 
     @ReactMethod
-    public void startChivoxRecord(ReadableMap options, final Promise promise) {
+    public void startChivoxRecord(final ReadableMap options, final Promise promise) {
+        Log.e(TAG, "refText" + options.getString("coreType"));
         final String coreType = options.getString("coreType");
         final String refText = options.getString("refText");
         final int attachAudioUrl = options.getInt("attachAudioUrl");
@@ -104,6 +108,11 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
             promise.reject("0", "操作失败");
             return;
         }
+        this.dealData(options, attachAudioUrl, refText, coreType, promise);
+    }
+
+    private void dealData(final ReadableMap options, final int attachAudioUrl, final String refText,
+                          final String coreType, final Promise promise) {
         workerThread.execute(new Runnable() {
             @Override
             public void run() {
@@ -125,8 +134,39 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
                     // 内核请求参数
                     JSONObject request = new JSONObject();
                     request.put("attachAudioUrl", attachAudioUrl);
-                    request.put("refText", refText);
+                    if (isJson(refText)) {
+                        JSONObject jsonObj = new JSONObject(refText);
+                        request.put("refText", jsonObj);
+                    } else {
+                        request.put("refText", refText);
+                    }
+
                     request.put("coreType", coreType);
+
+
+                    if (options.hasKey("rank")) {
+                        final int rank = options.getInt("rank");
+                        if (rank != 0) {
+                            request.put("rank", rank);
+                        }
+
+                    }
+
+                    if (options.hasKey("precision")) {
+                        final int precision = options.getInt("precision");
+                        if (precision != 0) {
+                            request.put("precision", precision);
+                        }
+                    }
+
+                    if (options.hasKey("keywords")) {
+                        final ReadableArray keywords = options.getArray("keywords");
+                        if (keywords != null) {
+                            request.put("keywords", keywords.toArrayList());
+                        }
+                    }
+
+
                     param.put("request", request);
 
                 } catch (JSONException e) {
@@ -192,6 +232,16 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
         });
 
     }
+
+    public boolean isJson(String content) {
+        try {
+            com.alibaba.fastjson.JSONObject jsonElement = com.alibaba.fastjson.JSONObject.parseObject(content);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 
     /**
      * 发送通知

@@ -71,4 +71,5 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.facebook.react:react-native:+'
     implementation files('libs/chivox_android_sdk_release.jar')
+    implementation 'com.alibaba:fastjson:1.1.67.android'
 }
