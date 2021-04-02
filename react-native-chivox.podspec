@@ -5,7 +5,7 @@ package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 Pod::Spec.new do |s|
   s.name         = "react-native-chivox"
   s.version      = package["version"]
-  s.summary      = "A <Video /> element for react-native"
+  s.summary      = "React Native lib for http://doc.api.chivox.com/opendoc/#/README"
   s.author       = "yunti"
 
   s.homepage     = "https://github.com/yuntitechreact-native-chivox"
