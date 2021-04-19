@@ -285,6 +285,8 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
 
     @Override
     public void onHostDestroy() {
-        mEngine.destroy();
+        if(mEngine!=null){
+            mEngine.destroy();
+        }
     }
 }
