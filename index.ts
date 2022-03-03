@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from "react-native";
+import { NativeEventEmitter, NativeModules } from "react-native";
 
 const { ChivoxModule } = NativeModules;
 
@@ -22,9 +22,66 @@ export interface LmParam {
  * 监听数据返回的通知
  */
 export const getChivoxDataNotification =
-  "cn.bookln.oneClickLogin.getChivoxDataNotification";
+  "com.yunti.chivox.getChivoxDataNotification";
+
+export type ChivoxRecordEventCallBack = {
+  success: boolean;
+  data: string;
+};
+
+export enum ChivoxRecordEventType {
+  /**
+   * 内置录音
+   */
+  InnerRecordEvent = "innerRecordEvent",
+  /**
+   * 外部录音
+   */
+  OuterReedEvent = "outerRecordEvent",
+}
 
 class ChivoxRecordUtil {
+  private isAvailable: boolean;
+  private _emitter?: NativeEventEmitter;
+  constructor() {
+    if (ChivoxModule == null) {
+      this.isAvailable = false;
+    } else {
+      this.isAvailable = true;
+      const emitter = new NativeEventEmitter(ChivoxModule);
+      this._emitter = emitter;
+    }
+  }
+
+
+  /**
+   * 添加监听
+   */
+  public addListener(type: ChivoxRecordEventType, callback: (data: ChivoxRecordEventCallBack) => void) {
+    const emitter = this._emitter;
+    if (emitter == null) {
+      throw new Error('Cannot use ChivoxRecordUtil when `isAvailable` is false.');
+    }
+    if (!Object.values(ChivoxRecordEventType).includes(type)) {
+      throw new Error('请传入正确的 type');
+    }
+    switch (type) {
+      case ChivoxRecordEventType.InnerRecordEvent: {
+        const handler: (data: ChivoxRecordEventCallBack) => void = callback;
+        return emitter.addListener(getChivoxDataNotification, (data: ChivoxRecordEventCallBack) => {
+          handler(data);
+        });
+      }
+      // TODO: 外部录音原生端目前待实现
+      case ChivoxRecordEventType.OuterReedEvent: {
+        const handler: (data: ChivoxRecordEventCallBack) => void = callback;
+        return emitter.addListener(getChivoxDataNotification, (data: ChivoxRecordEventCallBack) => {
+          handler(data);
+        });
+      }
+    }
+  }
+
   /**
    * 初始化
    * @param appKey

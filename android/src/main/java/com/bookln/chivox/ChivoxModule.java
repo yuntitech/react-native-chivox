@@ -39,7 +39,7 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
     public static final String NAME = "ChivoxModule";
     private static final String TAG = "villa";
     private ExecutorService workerThread = Executors.newFixedThreadPool(1);
-    private static final String GET_CHIVOX_DATA_NOTIFICATION = "cn.bookln.oneClickLogin.getChivoxDataNotification";
+    private static final String GET_CHIVOX_DATA_NOTIFICATION = "com.yunti.chivox.getChivoxDataNotification";
 
 
     private Engine mEngine;

@@ -1,7 +1,7 @@
 #import "RNChivox.h"
 #import "CAIEngine.h"
 
-static NSString *const ChivoxEventNotification = @"cn.bookln.oneClickLogin.getChivoxDataNotification";
+static NSString *const ChivoxEventNotification = @"com.yunti.chivox.getChivoxDataNotification";
 
 NSString *const kCoreType = @"coreType";
 NSString *const kRefText = @"refText";
