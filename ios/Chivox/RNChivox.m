@@ -277,10 +277,12 @@ RCT_EXPORT_METHOD(sendOuterFeedAudioFile:(nonnull NSString *)filePath
         if (0 != [value errId]){
             reject(@([value errId]).stringValue,@"sendChivoxOuterFeedAudioFile操作失败", nil);
             [self.cloudengine cancel];
+            fclose(file);
             return;
         }
     }
     [self.cloudengine cancel];
+    fclose(file);
     resolve(nil);
 }
 
