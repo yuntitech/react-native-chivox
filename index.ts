@@ -106,6 +106,27 @@ class ChivoxRecordUtil {
   public stopChivoxRecord = async (): Promise<string> => {
     return ChivoxModule.stopChivoxRecord();
   };
+
+  /**
+   * 创建外部录音
+   * 
+   * 音频参数
+   * @param param 
+   * @returns 
+   */
+  public outerFeed = async (param: ChivoxRecordParam): Promise<string> => {
+    return ChivoxModule.outerFeed(param);
+  }
+
+  /**
+   * 发送录音
+   * 
+   * 录音本地地址
+   * @param path 
+   */
+  public sendOuterFeedAudioFile = async (path: string): Promise<string> => {
+    return ChivoxModule.sendOuterFeedAudioFile(path);
+  }
 }
 
 export const chivoxRecordUtil = new ChivoxRecordUtil();
