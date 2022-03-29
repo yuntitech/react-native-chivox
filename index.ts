@@ -2,6 +2,9 @@ import { NativeEventEmitter, NativeModules } from "react-native";
 
 const { ChivoxModule } = NativeModules;
 
+export interface ChivoxRecordResultParam {
+  word?: number;
+}
 export interface ChivoxRecordParam {
   coreType: string;
   refText?: string;
@@ -9,6 +12,9 @@ export interface ChivoxRecordParam {
   keywords?: string[];
   rank?: number;
   precision?: number;
+  result?: {
+    details?: ChivoxRecordResultParam;
+  }
 }
 export interface RecordAndRetellRefParam {
   lm: LmParam[];

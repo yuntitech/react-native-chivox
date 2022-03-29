@@ -89,7 +89,7 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
     return;
   }
   
-  NSMutableDictionary *params = [self createParametersWithOptions:options];
+  NSMutableDictionary *params = options;
   if (params == nil) {
     reject(@"0",@"操作失败", nil);
     return;
