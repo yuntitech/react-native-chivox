@@ -35,6 +35,7 @@ NSString *const kServerTimeout = @"serverTimeout";
 
 @interface RNChivox()
 @property (nonatomic, nullable)ChivoxAIEngine *cloudengine;
+@property(nonatomic, assign) AVAudioSessionCategory lastCategory;
 @end
 
 @implementation RNChivox
@@ -47,6 +48,8 @@ RCT_EXPORT_MODULE(ChivoxModule)
 
 RCT_EXPORT_METHOD(initChivoxSdk:(NSString *)appKey
                   secretKey:(NSString *)secretKey) {
+  self.lastCategory = [[AVAudioSession sharedInstance] category];
+  
   // 构建配置信息
   NSMutableDictionary *cfg = [[NSMutableDictionary alloc] init]; //设置传入参数
   NSMutableDictionary *cloud = [[NSMutableDictionary alloc] init];//设置cloud参数
@@ -117,10 +120,14 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
   };
   [ChivoxAIRecorderNotify sharedInstance].onRecordStop = ^{
     NSLog(@"stop recorder");
+    [[AVAudioSession sharedInstance] setCategory:self.lastCategory error:nil];
   };
   
   ChivoxAIInnerRecorder *recorder = [self createInnerRecorder];
   NSMutableString *tokenid = [[NSMutableString alloc] init];
+  
+  // Remember last category
+  self.lastCategory = [[AVAudioSession sharedInstance] category];
   
   // fix: The recorder failed to turn on: AVAudioSession is AVAudioSessionCategoryPlayback
   [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:nil];
