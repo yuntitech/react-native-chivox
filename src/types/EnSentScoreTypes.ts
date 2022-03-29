@@ -1,4 +1,4 @@
-import { ChivoxCoreType, ChivoxRequest, ChivoxResponse } from "./ChivoxTypes";
+import { ChivoxCoreType, ChivoxRequest } from "./ChivoxTypes";
 
 /**
  * 英文句子内核 request。
