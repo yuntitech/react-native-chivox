@@ -1,21 +1,18 @@
 import { NativeEventEmitter, NativeModules } from "react-native";
 import {
-  ChivoxRequest,
-  ChivoxResponse,
-  ChivoxCoreType,
+  ChivoxCoreType, ChivoxRequest,
+  ChivoxResponse
 } from "./src/types/ChivoxTypes";
-import {
-  ChivoxEnWordPronRequest,
-  ChivoxEnWordPronResponse,
-} from "./src/types/EnWordPronTypes";
 import { ChivoxEnSentScoreRequest } from "./src/types/EnSentScoreTypes";
+import {
+  ChivoxEnWordPronRequest
+} from "./src/types/EnWordPronTypes";
 
 export {
   ChivoxRequest,
   ChivoxResponse,
   ChivoxCoreType,
   ChivoxEnWordPronRequest,
-  ChivoxEnWordPronResponse,
   ChivoxEnSentScoreRequest,
 };
 
@@ -30,7 +27,7 @@ export interface ChivoxRecordResultParam {
  */
 export interface ChivoxRecordParam {
   /** 设置“cloud”，表示使用在线评测功能 */
-  coreProvideType: "cloud";
+  coreProvideType?: "cloud";
 
   /**
    * 是否实时返回音量，默认0，如果设置1，音量大小通过 5.接收结果中onSoundIntensity接口回调，参数为“sound_intensity”,数值范围0~100；
@@ -67,7 +64,15 @@ export interface ChivoxRecordParam {
      */
     userId?: string;
   };
-  audio: {
+  /**
+   * 音频参数。
+   * 默认：
+   * - audioType: 'wav'
+   * - channel: 1
+   * - sampleBytes: 2
+   * - sampleRate: 16000
+   */
+  audio?: {
     /** 音频编码格式 */
     audioType: string;
 
@@ -185,7 +190,19 @@ class ChivoxRecordUtil {
   public startChivoxRecord = async (
     param: ChivoxRecordParam
   ): Promise<string> => {
-    return ChivoxModule.startChivoxRecord(param);
+    const audioParam: ChivoxRecordParam["audio"] = param.audio ?? {
+      audioType: "wav",
+      sampleRate: 16000,
+      sampleBytes: 2,
+      channel: 1,
+    };
+
+    const paramWithDefault: ChivoxRecordParam = {
+      ...param,
+      coreProvideType: param.coreProvideType ?? "cloud",
+      audio: audioParam,
+    };
+    return ChivoxModule.startChivoxRecord(paramWithDefault);
   };
 
   /**
