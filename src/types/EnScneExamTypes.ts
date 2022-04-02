@@ -1,5 +1,9 @@
 import { ChivoxCoreType, ChivoxRequest } from "./ChivoxTypes";
 
+/**
+ * 英文半开放题型
+ * @see https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/en.scne.exam
+ */
 export type ChivoxEnScneExamRequest = ChivoxRequest & {
     /**en.scne.exam表示半开放题型 */
     coreType: ChivoxCoreType.EnScneExam;
@@ -31,7 +35,7 @@ export type ChivoxEnScneExamRequest = ChivoxRequest & {
                 1.答案需要填入正确的内容，不能文不对题或存在语法错误等;
                 2.答案尽量涵盖学生的各种可能表达方式。在建议的数量上，可以多传入;
                 3.答案应该站在最终用户的表达角度上写;
-                https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/textformat
+                @see https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/textformat
              */
             text: string
         }

@@ -1,5 +1,9 @@
 import { ChivoxRequest } from "./ChivoxTypes";
 
+/**
+ *英文开放题型
+ @see https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/en.prtl.exam
+ */
 export type ChivoxEnPrtlExamRequest = ChivoxRequest & {
     /**en.prtl.exam表示开放题型 */
     coreType: string;
@@ -33,7 +37,7 @@ export type ChivoxEnPrtlExamRequest = ChivoxRequest & {
                 1.答案需要填入正确的内容，不能文不对题或存在语法错误等;
                 2.答案尽量涵盖学生的各种可能表达方式。在建议的数量上，可以多传入;
                 3.答案应该站在最终用户的表达角度上写;
-                https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/textformat
+               @see https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/textformat
              */
             text: string
         }

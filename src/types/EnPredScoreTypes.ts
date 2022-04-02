@@ -1,5 +1,9 @@
 import { ChivoxRequest } from "./ChivoxTypes";
 
+/**
+ * 英文段落朗读
+ * @see https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/en.pred.score
+ */
 export type ChivoxEnPredScoreRequest = ChivoxRequest & {
    /**en.pred.score表示英文段落朗读 */
    coreType: string;
@@ -26,7 +30,7 @@ export type ChivoxEnPredScoreRequest = ChivoxRequest & {
    /**
     * 评分参考文本，建议20~200个单词；
        详情参考文本符号说明
-       https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/textformat
+     @see  https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/textformat
    */
    refText: string;
    /**
