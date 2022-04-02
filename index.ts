@@ -3,6 +3,10 @@ import {
   ChivoxCoreType, ChivoxRequest,
   ChivoxResponse
 } from "./src/types/ChivoxTypes";
+import { ChivoxEnPredScoreRequest } from "./src/types/EnPredScoreTypes";
+import { ChivoxEnPrtlExamRequest } from "./src/types/EnPrtlExamTypes";
+import { ChivoxEnScneExamRequest } from "./src/types/EnScneExamTypes";
+import { ChivoxEnSentPronRequest } from "./src/types/EnSentPronTypes";
 import { ChivoxEnSentScoreRequest } from "./src/types/EnSentScoreTypes";
 import {
   ChivoxEnWordPronRequest
@@ -14,6 +18,10 @@ export {
   ChivoxCoreType,
   ChivoxEnWordPronRequest,
   ChivoxEnSentScoreRequest,
+  ChivoxEnSentPronRequest,
+  ChivoxEnScneExamRequest,
+  ChivoxEnPrtlExamRequest,
+  ChivoxEnPredScoreRequest
 };
 
 const { ChivoxModule } = NativeModules;
