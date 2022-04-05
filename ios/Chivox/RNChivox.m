@@ -206,17 +206,32 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
 RCT_EXPORT_METHOD(stopChivoxRecord:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
   if (self.cloudengine == nil) {
-    reject(@"0",@"stopChivoxRecord操作失败", nil);
+    reject(@"0",@"stopChivoxRecord操作失败，cloudengine 为 nil", nil);
     return;
   }
   
   ChivoxAIRetValue * e  = nil;
   e = [self.cloudengine stop];
   if (0 != [e errId]){
-    reject(@([e errId]).stringValue,@"stopChivoxRecord操作失败", nil);
+    NSString *errMsg = [NSString stringWithFormat:@"stopChivoxRecord操作失败:%@", e.error];
+    reject(@([e errId]).stringValue, errMsg, nil);
   } else {
     resolve(nil);
   }
+}
+
+/**
+ 取消驰声评测
+ */
+RCT_EXPORT_METHOD(cancelChivoxRecord:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+  if (self.cloudengine == nil) {
+    reject(@"0",@"stopChivoxRecord操作失败", nil);
+    return;
+  }
+  
+  [self.cloudengine cancel];
+  resolve(nil);
 }
 
 @end

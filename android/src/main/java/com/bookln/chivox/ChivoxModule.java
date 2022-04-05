@@ -309,15 +309,28 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
     @ReactMethod
     public void stopChivoxRecord(Promise promise) {
         if (mEngine == null) {
-            promise.reject("0", "操作失败");
+            promise.reject("0", "驰声 SDK stopChivoxRecord 失败，驰声 SDK 引擎为 null");
             return;
         }
         RetValue ret = mEngine.stop();
         if (0 != ret.errId) {
-            promise.reject(String.valueOf(ret.errId), "操作失败");
+            promise.reject(String.valueOf(ret.errId), "驰声 SDK stopChivoxRecord 失败: " + ret.error);
         } else {
             promise.resolve(null);
         }
+    }
+
+    /**
+     * 取消驰声SDK评测
+     */
+    @ReactMethod
+    public void cancelChivoxRecord(Promise promise) {
+        if (mEngine == null) {
+            promise.reject("0", "驰声 SDK stopChivoxRecord 失败，驰声 SDK 引擎为 null");
+            return;
+        }
+        mEngine.cancel();
+        promise.resolve(null);
     }
 
 

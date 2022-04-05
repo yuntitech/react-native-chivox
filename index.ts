@@ -1,16 +1,15 @@
-import { NativeEventEmitter, NativeModules } from "react-native";
+import { NativeEventEmitter, NativeModules } from 'react-native';
 import {
-  ChivoxCoreType, ChivoxRequest,
-  ChivoxResponse
-} from "./src/types/ChivoxTypes";
-import { ChivoxEnPredScoreRequest } from "./src/types/EnPredScoreTypes";
-import { ChivoxEnPrtlExamRequest } from "./src/types/EnPrtlExamTypes";
-import { ChivoxEnScneExamRequest } from "./src/types/EnScneExamTypes";
-import { ChivoxEnSentPronRequest } from "./src/types/EnSentPronTypes";
-import { ChivoxEnSentScoreRequest } from "./src/types/EnSentScoreTypes";
-import {
-  ChivoxEnWordPronRequest
-} from "./src/types/EnWordPronTypes";
+  ChivoxCoreType,
+  ChivoxRequest,
+  ChivoxResponse,
+} from './src/types/ChivoxTypes';
+import { ChivoxEnPredScoreRequest } from './src/types/EnPredScoreTypes';
+import { ChivoxEnPrtlExamRequest } from './src/types/EnPrtlExamTypes';
+import { ChivoxEnScneExamRequest } from './src/types/EnScneExamTypes';
+import { ChivoxEnSentPronRequest } from './src/types/EnSentPronTypes';
+import { ChivoxEnSentScoreRequest } from './src/types/EnSentScoreTypes';
+import { ChivoxEnWordPronRequest } from './src/types/EnWordPronTypes';
 
 export {
   ChivoxRequest,
@@ -21,7 +20,7 @@ export {
   ChivoxEnSentPronRequest,
   ChivoxEnScneExamRequest,
   ChivoxEnPrtlExamRequest,
-  ChivoxEnPredScoreRequest
+  ChivoxEnPredScoreRequest,
 };
 
 const { ChivoxModule } = NativeModules;
@@ -35,7 +34,7 @@ export interface ChivoxRecordResultParam {
  */
 export interface ChivoxRecordParam {
   /** 设置“cloud”，表示使用在线评测功能 */
-  coreProvideType?: "cloud";
+  coreProvideType?: 'cloud';
 
   /**
    * 是否实时返回音量，默认0，如果设置1，音量大小通过 5.接收结果中onSoundIntensity接口回调，参数为“sound_intensity”,数值范围0~100；
@@ -113,7 +112,7 @@ export interface LmParam {
  * 监听数据返回的通知
  */
 export const getChivoxDataNotification =
-  "com.yunti.chivox.getChivoxDataNotification";
+  'com.yunti.chivox.getChivoxDataNotification';
 
 export type ChivoxRecordEventCallBack = {
   success: boolean;
@@ -124,11 +123,11 @@ export enum ChivoxRecordEventType {
   /**
    * 内置录音
    */
-  InnerRecordEvent = "innerRecordEvent",
+  InnerRecordEvent = 'innerRecordEvent',
   /**
    * 外部录音
    */
-  OuterReedEvent = "outerRecordEvent",
+  OuterReedEvent = 'outerRecordEvent',
 }
 
 class ChivoxRecordUtil {
@@ -154,11 +153,11 @@ class ChivoxRecordUtil {
     const emitter = this._emitter;
     if (emitter == null) {
       throw new Error(
-        "Cannot use ChivoxRecordUtil when `isAvailable` is false."
+        'Cannot use ChivoxRecordUtil when `isAvailable` is false.'
       );
     }
     if (!Object.values(ChivoxRecordEventType).includes(type)) {
-      throw new Error("请传入正确的 type");
+      throw new Error('请传入正确的 type');
     }
     switch (type) {
       case ChivoxRecordEventType.InnerRecordEvent: {
@@ -198,8 +197,8 @@ class ChivoxRecordUtil {
   public startChivoxRecord = async (
     param: ChivoxRecordParam
   ): Promise<string> => {
-    const audioParam: ChivoxRecordParam["audio"] = param.audio ?? {
-      audioType: "wav",
+    const audioParam: ChivoxRecordParam['audio'] = param.audio ?? {
+      audioType: 'wav',
       sampleRate: 16000,
       sampleBytes: 2,
       channel: 1,
@@ -207,7 +206,7 @@ class ChivoxRecordUtil {
 
     const paramWithDefault: ChivoxRecordParam = {
       ...param,
-      coreProvideType: param.coreProvideType ?? "cloud",
+      coreProvideType: param.coreProvideType ?? 'cloud',
       audio: audioParam,
     };
     return ChivoxModule.startChivoxRecord(paramWithDefault);
@@ -218,6 +217,13 @@ class ChivoxRecordUtil {
    */
   public stopChivoxRecord = async (): Promise<string> => {
     return ChivoxModule.stopChivoxRecord();
+  };
+
+  /**
+   * 取消录音
+   */
+  public cancelChivoxRecord = async (): Promise<void> => {
+    ChivoxModule.cancelChivoxRecord();
   };
 }
 
