@@ -1,3 +1,15 @@
+package com.bookln.chivox;
+
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.chivox.aiengine.AudioSrc;
+import com.chivox.aiengine.Engine;
+import com.chivox.aiengine.EvalResult;
+import com.chivox.aiengine.EvalResultListener;
+import com.chivox.aiengine.RetValue;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -6,47 +18,98 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.ExecutorService;
-@@ -31,13 +31,12 @@ import java.util.concurrent.Executors;
+import java.util.concurrent.Executors;
+
+
+/**
  * @version V1.0 <描述当前版本功能>
  * @FileName: ChivoxModule.java
  * @author: villa_mou
  * @date: 05-14:43
  * @desc
  */
-@ReactModule(name = ChivoxModule.NAME)
 public class ChivoxModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
     public static final String NAME = "ChivoxModule";
     private static final String TAG = "villa";
     private ExecutorService workerThread = Executors.newFixedThreadPool(1);
     private static final String GET_CHIVOX_DATA_NOTIFICATION = "com.yunti.chivox.getChivoxDataNotification";
 
-@@ -97,80 +96,127 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
+
+    private Engine mEngine;
+
+    public ChivoxModule(ReactApplicationContext reactContext) {
+        super(reactContext);
+        reactContext.addLifecycleEventListener(this);
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+
+    @Override
+    public void initialize() {
+        super.initialize();
+
+    }
+
+    @ReactMethod
+    public void initChivoxSdk(final String appKey, final String SecretKey) {
+        workerThread.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (getCurrentActivity() == null) {
+                    return;
+                }
+                try {
+                    JSONObject cfg = new JSONObject();
+                    String provisionPath = AIEngineHelper.extractResourceOnce(getCurrentActivity().getApplicationContext(), "aiengine.provision", false);
+                    cfg.put(Const.APP_KEY, appKey);
+                    cfg.put(Const.SECRET_KEY, SecretKey);
+                    cfg.put(Const.PROVISION, provisionPath);
+                    JSONObject cloud = new JSONObject();
+                    cloud.put("enable", 1);
+                    cfg.put(Const.CLOUD, cloud);
+                    Engine.create(getCurrentActivity(), cfg, new Engine.CreateCallback() {
+                        @Override
+                        public void onSuccess(Engine engine) {
+                            mEngine = engine;
+                            Log.e(TAG, "onSuccess");
+                        }
+
+                        @Override
+                        public void onFail(RetValue err) {
+                            Log.e(TAG, "err" + err.error);
+                        }
+                    });
+                } catch (JSONException e) {
+                }
+
+            }
         });
 
     }
 
     @ReactMethod
     public void startChivoxRecord(final ReadableMap options, final Promise promise) {
-        Log.e(TAG, "refText" + options.getString("coreType"));
-        final String coreType = options.getString("coreType");
-        final String refText = options.getString("refText");
-        final int attachAudioUrl = options.getInt("attachAudioUrl");
-        if (getCurrentActivity() == null || TextUtils.isEmpty(coreType) || TextUtils.isEmpty(refText) || mEngine == null) {
-       
+
         final ReadableMap request = options.getMap("request");
-        final ReadableType refTextType = request.getType("refText");
-         Object  refText = null;
+         ReadableType refTextType =null;
+        if(request.hasKey("refText")){
+            refTextType = request.getType("refText");
+        }
+        Object  refText = null;
         if(refTextType==ReadableType.String){
             refText = request.getString("refText");
         }else  if(refTextType==ReadableType.Map){
-          refText = request.getMap("refText");
+            refText = request.getMap("refText");
 
         }
         String coreType = null;
@@ -65,128 +128,213 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
         this.dealData(options, attachAudioUrl, refText, coreType, promise);
     }
 
-    private void dealData(final ReadableMap options, final int attachAudioUrl, final String refText,
     private void dealData(final ReadableMap options, final int attachAudioUrl, final Object refText,
                           final String coreType, final Promise promise) {
         workerThread.execute(new Runnable() {
             @Override
             public void run() {
+                boolean finished = false;
                 // 使用内部录音模式进行评测
                 JSONObject param = new JSONObject();
 
                 try {
                     // 在线评测 or 离线评测
-                    param.put("coreProvideType", "cloud");
-                    if(options.hasKey("coreProvideType")){
-                        final String coreProvideType=options.getString("coreProvideType");
+                    if (options.hasKey("coreProvideType")) {
+                        final String coreProvideType = options.getString("coreProvideType");
                         param.put("coreProvideType", coreProvideType);
-                    }else{
+                    } else {
                         param.put("coreProvideType", "cloud");
                     }
 
-                    if(options.hasKey("audioType")){
-                        final String audioType=options.getString("audioType");
+                    if (options.hasKey("audioType")) {
+                        final String audioType = options.getString("audioType");
                         param.put("audioType", audioType);
-                    }else{
+                    } else {
                         param.put("audioType", "wav");
                     }
 
-                    if(options.hasKey("channel")){
-                        final Integer channel=options.getInt("channel");
+                    if (options.hasKey("channel")) {
+                        final Integer channel = options.getInt("channel");
                         param.put("channel", channel);
-                    }else{
+                    } else {
                         param.put("channel", 1);
                     }
 
-                    if(options.hasKey("sampleBytes")){
-                        final Integer sampleBytes=options.getInt("sampleBytes");
+                    if (options.hasKey("sampleBytes")) {
+                        final Integer sampleBytes = options.getInt("sampleBytes");
                         param.put("sampleBytes", sampleBytes);
-                    }else{
+                    } else {
                         param.put("sampleBytes", 2);
                     }
 
-                    if(options.hasKey("sampleRate")){
-                        final Integer sampleRate=options.getInt("sampleRate");
+                    if (options.hasKey("sampleRate")) {
+                        final Integer sampleRate = options.getInt("sampleRate");
                         param.put("sampleRate", sampleRate);
-                    }else{
+                    } else {
                         param.put("sampleRate", 16000);
                     }
 
-                    if(options.hasKey("compress")){
-                        final String compress=options.getString("compress");
+                    if (options.hasKey("compress")) {
+                        final String compress = options.getString("compress");
                         param.put("compress", compress);
-                    }else{
+                    } else {
                         param.put("compress", "speex");
                     }
 
                     // 在线评测 or 离线评测
                     // 设置音频属性，要与实际音频匹配,比选
-                    JSONObject audio = new JSONObject();
-                    audio.put("audioType", "wav");
-                    audio.put("channel", 1);
-                    audio.put("sampleBytes", 2);
-                    audio.put("sampleRate", 16000);
-                    // 上传音频时是否采用压缩
-                    audio.put("compress", "speex");
-                    param.put("audio", audio);
 
 
                     // 内核请求参数
-                    JSONObject request = new JSONObject();
-                    request.put("attachAudioUrl", attachAudioUrl);
-                    if (isJson(refText)) {
-                        JSONObject jsonObj = new JSONObject(refText);
-                        request.put("refText", jsonObj);
-                    } else {
-                        request.put("refText", refText);
-                    }
                     JSONObject requests = new JSONObject();
                     requests.put("attachAudioUrl", attachAudioUrl);
-
-                    request.put("coreType", coreType);
-                        requests.put("refText", refText);
-//
-
+                    requests.put("refText", refText);
                     requests.put("coreType", coreType);
 
-                    if (options.hasKey("rank")) {
-                        final int rank = options.getInt("rank");
                     final ReadableMap request = options.getMap("request");
                     if (request.hasKey("rank")) {
                         final int rank = request.getInt("rank");
                         if (rank != 0) {
-                            request.put("rank", rank);
                             requests.put("rank", rank);
                         }
 
                     }
 
-                    if (options.hasKey("precision")) {
-                        final int precision = options.getInt("precision");
                     if (request.hasKey("precision")) {
                         final int precision = request.getInt("precision");
                         if (precision != 0) {
-                            request.put("precision", precision);
                             requests.put("precision", precision);
                         }
                     }
 
-                    if (options.hasKey("keywords")) {
-                        final ReadableArray keywords = options.getArray("keywords");
                     if (request.hasKey("keywords")) {
                         final ReadableArray keywords = request.getArray("keywords");
                         if (keywords != null) {
-                            request.put("keywords", keywords.toArrayList());
                             requests.put("keywords", keywords.toArrayList());
                         }
                     }
 
-
-                    param.put("request", request);
                     param.put("request", requests);
 
                 } catch (JSONException e) {
                     promise.reject("0", "操作失败");
-                    return;
+                    finished = true;
                 }
-                // 配置录音机选项
+                if (!finished) {// 配置录音机选项
+                    AudioSrc.InnerRecorder innerRecorder = new AudioSrc.InnerRecorder();
+                    innerRecorder.recordParam.sampleBytes = 2;
+                    innerRecorder.recordParam.sampleRate = 16000;
+                    // 如果需要录音自动停止的话，可设置录音时间。
+//                innerRecorder.recordParam.duration = 3000;
+                    // tokenId - 用于接收评测任务ID
+                    StringBuilder tokenId = new StringBuilder();
+                    RetValue ret = mEngine.start(getCurrentActivity(), innerRecorder, tokenId, param, new EvalResultListener() {
+
+                        @Override
+                        public void onError(String s, EvalResult evalResult) {
+                            // 评测失败，请查看result.errId, result.error分析失败原因。
+                            // 当进入这里的时候，请调用engine.cancel()接口重置engine，否则下次无法正常start。
+                            Log.e(TAG, "recordonError" + evalResult.text());
+                            mEngine.cancel();
+                            WritableMap event = Arguments.createMap();
+                            event.putBoolean("success", false);
+                            sendEvent(GET_CHIVOX_DATA_NOTIFICATION, event);
+                        }
+
+                        @Override
+                        public void onEvalResult(String s, final EvalResult evalResult) {
+                            Log.e(TAG, "recordEvalResult.text:" + evalResult.text());
+                            WritableMap event = Arguments.createMap();
+                            event.putString("data", evalResult.text());
+                            event.putBoolean("success", true);
+                            sendEvent(GET_CHIVOX_DATA_NOTIFICATION, event);
+                        }
+
+                        @Override
+                        public void onBinResult(String s, final EvalResult evalResult) {
+
+                        }
+
+                        @Override
+                        public void onVad(String s, final EvalResult evalResult) {
+
+                        }
+
+                        @Override
+                        public void onSoundIntensity(String s, final EvalResult evalResult) {
+
+                        }
+
+                        @Override
+                        public void onOther(String s, final EvalResult evalResult) {
+
+                        }
+                    });
+                    if (0 != ret.errId) {
+                        promise.reject(String.valueOf(ret.errId), "操作失败");
+                    } else {
+                        promise.resolve(null);
+                    }
+                }
+            }
+        });
+
+    }
+
+    public boolean isJson(String content) {
+        try {
+            com.alibaba.fastjson.JSONObject jsonElement = com.alibaba.fastjson.JSONObject.parseObject(content);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    /**
+     * 发送通知
+     *
+     * @param eventName
+     * @param params
+     */
+    private void sendEvent(
+            String eventName,
+            WritableMap params) {
+        getReactApplicationContext()
+                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                .emit(eventName, params);
+    }
+
+
+    @ReactMethod
+    public void stopChivoxRecord(Promise promise) {
+        if (mEngine == null) {
+            promise.reject("0", "操作失败");
+            return;
+        }
+        RetValue ret = mEngine.stop();
+        if (0 != ret.errId) {
+            promise.reject(String.valueOf(ret.errId), "操作失败");
+        } else {
+            promise.resolve(null);
+        }
+    }
+
+
+    @Override
+    public void onHostResume() {
+
+    }
+
+    @Override
+    public void onHostPause() {
+
+    }
+
+    @Override
+    public void onHostDestroy() {
+        if(mEngine!=null){
+            mEngine.destroy();
+        }
+    }
+}
