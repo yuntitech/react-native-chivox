@@ -195,7 +195,7 @@ class ChivoxRecordUtil {
    * 开始录音，并监听数据的回调
    */
   public startChivoxRecord = async (
-    param: ChivoxRecordParam
+    param: any
   ): Promise<string> => {
     const audioParam: ChivoxRecordParam['audio'] = param.audio ?? {
       audioType: 'wav',

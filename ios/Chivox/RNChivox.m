@@ -89,8 +89,7 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
     return;
   }
   
-  NSMutableDictionary *params = options;
-  if (params == nil) {
+  if (options == nil) {
     reject(@"0",@"操作失败", nil);
     return;
   }
@@ -133,7 +132,8 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
   [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:nil];
   
   // 开始评测
-  e = [self.cloudengine start:recorder tokenId:tokenid param:params listener:handler];
+  e = [self.cloudengine start:recorder tokenId:tokenid param:options.mutableCopy listener:handler];
+  NSLog(@"%@",options);
   if (0 != [e errId]){
     reject(@([e errId]).stringValue,@"startChivoxRecord操作失败", nil);
   } else {
