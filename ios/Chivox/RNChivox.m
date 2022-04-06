@@ -109,6 +109,7 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
   
   // 错误回调
   handler.onError = ^(NSString * _Nonnull eval, ChivoxAIEvalResult *_Nonnull result) {
+    [[AVAudioSession sharedInstance] setCategory:self.lastCategory error:nil];
     NSDictionary *body = @{ @"data":@"onError:----", @"success":@(false) };
     [self sendEventWithName:ChivoxEventNotification body:body];
   };
@@ -135,6 +136,7 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
   e = [self.cloudengine start:recorder tokenId:tokenid param:options.mutableCopy listener:handler];
   NSLog(@"%@",options);
   if (0 != [e errId]){
+    [[AVAudioSession sharedInstance] setCategory:self.lastCategory error:nil];
     reject(@([e errId]).stringValue,@"startChivoxRecord操作失败", nil);
   } else {
     resolve(nil);
