@@ -10,7 +10,7 @@
  * - 英文开放题型	en.prtl.exam	<180
  * - 英文自由识别评测	en.asr.rec	≤300
  */
-export enum ChivoxCoreType {
+ export enum ChivoxCoreType {
   EnWordScore = "en.word.score",
   EnWordPron = "en.word.pron",
   EnSentScore = "en.sent.score",
@@ -18,7 +18,7 @@ export enum ChivoxCoreType {
   EnPredScore = "en.pred.score",
   EnChocScore = "en.choc.score",
   EnSentRecScore = "en.sent.recscore",
-  EnScneExam = "en,scne,exam",
+  EnScneExam = "en.scne.exam",
   EnPrtlExam = "en.prtl.exam",
   EnAsrRec = "en.asr.rec",
 }
