@@ -16,13 +16,17 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -100,127 +104,15 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
     @ReactMethod
     public void startChivoxRecord(final ReadableMap options, final Promise promise) {
 
-        final ReadableMap request = options.getMap("request");
-         ReadableType refTextType =null;
-        if(request.hasKey("refText")){
-            refTextType = request.getType("refText");
-        }
-        Object  refText = null;
-        if(refTextType==ReadableType.String){
-            refText = request.getString("refText");
-        }else  if(refTextType==ReadableType.Map){
-            refText = request.getMap("refText");
 
-        }
-        String coreType = null;
-        int attachAudioUrl = 0;
-        if(request.hasKey("attachAudioUrl")){
-            attachAudioUrl=   request.getInt("attachAudioUrl");
-        }
-        if(request.hasKey("coreType")){
-            coreType=  request.getString("coreType");
-        }
-
-        if (getCurrentActivity() == null || TextUtils.isEmpty(coreType) || refText==null|| mEngine == null)  {
-            promise.reject("0", "操作失败");
-            return;
-        }
-        this.dealData(options, attachAudioUrl, refText, coreType, promise);
+        this.dealData(options, promise);
     }
 
-    private void dealData(final ReadableMap options, final int attachAudioUrl, final Object refText,
-                          final String coreType, final Promise promise) {
+    private void dealData(final ReadableMap options,final Promise promise) {
         workerThread.execute(new Runnable() {
             @Override
             public void run() {
-                boolean finished = false;
-                // 使用内部录音模式进行评测
-                JSONObject param = new JSONObject();
 
-                try {
-                    // 在线评测 or 离线评测
-                    if (options.hasKey("coreProvideType")) {
-                        final String coreProvideType = options.getString("coreProvideType");
-                        param.put("coreProvideType", coreProvideType);
-                    } else {
-                        param.put("coreProvideType", "cloud");
-                    }
-
-                    if (options.hasKey("audioType")) {
-                        final String audioType = options.getString("audioType");
-                        param.put("audioType", audioType);
-                    } else {
-                        param.put("audioType", "wav");
-                    }
-
-                    if (options.hasKey("channel")) {
-                        final Integer channel = options.getInt("channel");
-                        param.put("channel", channel);
-                    } else {
-                        param.put("channel", 1);
-                    }
-
-                    if (options.hasKey("sampleBytes")) {
-                        final Integer sampleBytes = options.getInt("sampleBytes");
-                        param.put("sampleBytes", sampleBytes);
-                    } else {
-                        param.put("sampleBytes", 2);
-                    }
-
-                    if (options.hasKey("sampleRate")) {
-                        final Integer sampleRate = options.getInt("sampleRate");
-                        param.put("sampleRate", sampleRate);
-                    } else {
-                        param.put("sampleRate", 16000);
-                    }
-
-                    if (options.hasKey("compress")) {
-                        final String compress = options.getString("compress");
-                        param.put("compress", compress);
-                    } else {
-                        param.put("compress", "speex");
-                    }
-
-                    // 在线评测 or 离线评测
-                    // 设置音频属性，要与实际音频匹配,比选
-
-
-                    // 内核请求参数
-                    JSONObject requests = new JSONObject();
-                    requests.put("attachAudioUrl", attachAudioUrl);
-                    requests.put("refText", refText);
-                    requests.put("coreType", coreType);
-
-                    final ReadableMap request = options.getMap("request");
-                    if (request.hasKey("rank")) {
-                        final int rank = request.getInt("rank");
-                        if (rank != 0) {
-                            requests.put("rank", rank);
-                        }
-
-                    }
-
-                    if (request.hasKey("precision")) {
-                        final int precision = request.getInt("precision");
-                        if (precision != 0) {
-                            requests.put("precision", precision);
-                        }
-                    }
-
-                    if (request.hasKey("keywords")) {
-                        final ReadableArray keywords = request.getArray("keywords");
-                        if (keywords != null) {
-                            requests.put("keywords", keywords.toArrayList());
-                        }
-                    }
-
-                    param.put("request", requests);
-
-                } catch (JSONException e) {
-                    promise.reject("0", "操作失败");
-                    finished = true;
-                }
-                if (!finished) {// 配置录音机选项
                     AudioSrc.InnerRecorder innerRecorder = new AudioSrc.InnerRecorder();
                     innerRecorder.recordParam.sampleBytes = 2;
                     innerRecorder.recordParam.sampleRate = 16000;
@@ -228,7 +120,15 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
 //                innerRecorder.recordParam.duration = 3000;
                     // tokenId - 用于接收评测任务ID
                     StringBuilder tokenId = new StringBuilder();
-                    RetValue ret = mEngine.start(getCurrentActivity(), innerRecorder, tokenId, param, new EvalResultListener() {
+
+                JSONObject param = null;
+                try {
+                    param = convertMapToJson(options);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                RetValue ret = mEngine.start(getCurrentActivity(), innerRecorder, tokenId,  param, new EvalResultListener() {
 
                         @Override
                         public void onError(String s, EvalResult evalResult) {
@@ -276,10 +176,66 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
                         promise.resolve(null);
                     }
                 }
-            }
         });
 
     }
+
+    private static JSONArray convertArrayToJson(ReadableArray readableArray) throws JSONException {
+        JSONArray array = new JSONArray();
+        for (int i = 0; i < readableArray.size(); i++) {
+            switch (readableArray.getType(i)) {
+                case Null:
+                    break;
+                case Boolean:
+                    array.put(readableArray.getBoolean(i));
+                    break;
+                case Number:
+                    array.put(readableArray.getDouble(i));
+                    break;
+                case String:
+                    array.put(readableArray.getString(i));
+                    break;
+                case Map:
+                    array.put(convertMapToJson(readableArray.getMap(i)));
+                    break;
+                case Array:
+                    array.put(convertArrayToJson(readableArray.getArray(i)));
+                    break;
+            }
+        }
+        return array;
+    }
+
+    private static JSONObject convertMapToJson(ReadableMap readableMap) throws JSONException {
+        JSONObject object = new JSONObject();
+        ReadableMapKeySetIterator iterator = readableMap.keySetIterator();
+        while (iterator.hasNextKey()) {
+            String key = iterator.nextKey();
+            switch (readableMap.getType(key)) {
+                case Null:
+                    object.put(key, JSONObject.NULL);
+                    break;
+                case Boolean:
+                    object.put(key, readableMap.getBoolean(key));
+                    break;
+                case Number:
+                    object.put(key, readableMap.getDouble(key));
+                    break;
+                case String:
+                    object.put(key, readableMap.getString(key));
+                    break;
+                case Map:
+                    object.put(key, convertMapToJson(readableMap.getMap(key)));
+                    break;
+                case Array:
+                    object.put(key, convertArrayToJson(readableMap.getArray(key)));
+                    break;
+            }
+        }
+        return object;
+    }
+
+
 
     public boolean isJson(String content) {
         try {
@@ -309,15 +265,28 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
     @ReactMethod
     public void stopChivoxRecord(Promise promise) {
         if (mEngine == null) {
-            promise.reject("0", "操作失败");
+            promise.reject("0", "驰声 SDK stopChivoxRecord 失败，驰声 SDK 引擎为 null");
             return;
         }
         RetValue ret = mEngine.stop();
         if (0 != ret.errId) {
-            promise.reject(String.valueOf(ret.errId), "操作失败");
+            promise.reject(String.valueOf(ret.errId), "驰声 SDK stopChivoxRecord 失败: " + ret.error);
         } else {
             promise.resolve(null);
         }
+    }
+
+    /**
+     * 取消驰声SDK评测
+     */
+    @ReactMethod
+    public void cancelChivoxRecord(Promise promise) {
+        if (mEngine == null) {
+            promise.reject("0", "驰声 SDK stopChivoxRecord 失败，驰声 SDK 引擎为 null");
+            return;
+        }
+        mEngine.cancel();
+        promise.resolve(null);
     }
 
 
