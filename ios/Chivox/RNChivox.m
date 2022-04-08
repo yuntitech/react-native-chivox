@@ -89,8 +89,7 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
     return;
   }
   
-  NSMutableDictionary *params = options;
-  if (params == nil) {
+  if (options == nil) {
     reject(@"0",@"操作失败", nil);
     return;
   }
@@ -110,6 +109,7 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
   
   // 错误回调
   handler.onError = ^(NSString * _Nonnull eval, ChivoxAIEvalResult *_Nonnull result) {
+    [[AVAudioSession sharedInstance] setCategory:self.lastCategory error:nil];
     NSDictionary *body = @{ @"data":@"onError:----", @"success":@(false) };
     [self sendEventWithName:ChivoxEventNotification body:body];
   };
@@ -133,8 +133,10 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
   [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:nil];
   
   // 开始评测
-  e = [self.cloudengine start:recorder tokenId:tokenid param:params listener:handler];
+  e = [self.cloudengine start:recorder tokenId:tokenid param:options.mutableCopy listener:handler];
+  NSLog(@"%@",options);
   if (0 != [e errId]){
+    [[AVAudioSession sharedInstance] setCategory:self.lastCategory error:nil];
     reject(@([e errId]).stringValue,@"startChivoxRecord操作失败", nil);
   } else {
     resolve(nil);
@@ -206,17 +208,32 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
 RCT_EXPORT_METHOD(stopChivoxRecord:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
   if (self.cloudengine == nil) {
-    reject(@"0",@"stopChivoxRecord操作失败", nil);
+    reject(@"0",@"stopChivoxRecord操作失败，cloudengine 为 nil", nil);
     return;
   }
   
   ChivoxAIRetValue * e  = nil;
   e = [self.cloudengine stop];
   if (0 != [e errId]){
-    reject(@([e errId]).stringValue,@"stopChivoxRecord操作失败", nil);
+    NSString *errMsg = [NSString stringWithFormat:@"stopChivoxRecord操作失败:%@", e.error];
+    reject(@([e errId]).stringValue, errMsg, nil);
   } else {
     resolve(nil);
   }
+}
+
+/**
+ 取消驰声评测
+ */
+RCT_EXPORT_METHOD(cancelChivoxRecord:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
+  if (self.cloudengine == nil) {
+    reject(@"0",@"stopChivoxRecord操作失败", nil);
+    return;
+  }
+  
+  [self.cloudengine cancel];
+  resolve(nil);
 }
 
 @end
