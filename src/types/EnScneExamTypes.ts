@@ -3,19 +3,21 @@ import { ChivoxCoreType, ChivoxRequest } from "./ChivoxTypes";
 /**
  * 英文半开放题型
  * @see https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/en.scne.exam
+ *
+ * @deprecated 直接传对象即可，不再固定结构
  */
 export type ChivoxEnScneExamRequest = ChivoxRequest & {
-    /**en.scne.exam表示半开放题型 */
-    coreType: ChivoxCoreType.EnScneExam;
-    /**
-     * 总分评分分制, 支持任意分制。
-     */
-    rank: number;
-    /** 评分精度，支持1和0.5 */
-    precision: 1 | 0.5;
-    /**评测结果中是否返回音频url */
-    attachAudioUrl?: 0 | 1;
-    /**
+  /**en.scne.exam表示半开放题型 */
+  coreType: ChivoxCoreType.EnScneExam;
+  /**
+   * 总分评分分制, 支持任意分制。
+   */
+  rank: number;
+  /** 评分精度，支持1和0.5 */
+  precision: 1 | 0.5;
+  /**评测结果中是否返回音频url */
+  attachAudioUrl?: 0 | 1;
+  /**
      * 关键的 词、词组、短语
      注意点
      1.尽可能将重要的得分要点提取为关键词，建议每句话至少设置一个关键词；
@@ -23,11 +25,11 @@ export type ChivoxEnScneExamRequest = ChivoxRequest & {
      3.请确保关键词的正确性，用户发音没有包含关键词，会直接影响内容维度打分进而影响总分；
      4.关键词需要出现在下面的refText字段的参考答案内容里；
      */
-    keyWords?: string[],
-    /**	参考答案 */
-    refText: {
-        lm: {
-            /**
+  keyWords?: string[];
+  /**	参考答案 */
+  refText: {
+    lm: {
+      /**
              * 参考答案，可以有多种可能的答案和说法。每种答案建议不要超过两句话。建议填写10个以上的答案。
                 文本格式参考文本符号说明
     
@@ -37,16 +39,16 @@ export type ChivoxEnScneExamRequest = ChivoxRequest & {
                 3.答案应该站在最终用户的表达角度上写;
                 @see https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/textformat
              */
-            text: string
-        }
-        /** 结果控制参数 */
-        result: {
-            details: {
-                /**
-                 * 统一各维度评分分制，设置为1
-                 */
-                use_inherit_rank: number
-            }
-        }
-    }
-}
+      text: string;
+    };
+    /** 结果控制参数 */
+    result: {
+      details: {
+        /**
+         * 统一各维度评分分制，设置为1
+         */
+        use_inherit_rank: number;
+      };
+    };
+  };
+};

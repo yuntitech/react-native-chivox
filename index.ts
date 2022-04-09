@@ -93,12 +93,7 @@ export interface ChivoxRecordParam {
     sampleRate: number;
   };
 
-  /**
-   * 评测请求，不同内核请求参数有所不同，具体查看英文内核 , 中文内核
-   * - https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/
-   * - https://www.chivox.com/opendoc/#/ChineseDoc/coreCn/
-   */
-  request?: ChivoxRequest;
+  request: Record<string, unknown>;
 }
 export interface RecordAndRetellRefParam {
   lm: LmParam[];

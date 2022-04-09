@@ -9,6 +9,8 @@
  * - 英文半开放题型	en.scne.exam	<120
  * - 英文开放题型	en.prtl.exam	<180
  * - 英文自由识别评测	en.asr.rec	≤300
+ *
+ * @deprecated 直接传字符串即可，不再固定类型
  */
  export enum ChivoxCoreType {
   EnWordScore = "en.word.score",
@@ -26,6 +28,8 @@
 /**
  * 基础Request，不直接使用。
  * 使用具体的request类型，如ChivoxEnWordPronRequest。
+ *
+ * @deprecated 直接传对象即可，不再固定结构
  */
 export type ChivoxRequest = {
   coreType: ChivoxCoreType;
@@ -48,6 +52,9 @@ export type ChivoxRequest = {
   attachAudioUrl?: 0 | 1;
 };
 
+/**
+ * @deprecated 直接使用返回的JSON object即可，不再固定结构
+ */
 export type ChivoxResponse = {
   /**
    * 音频及数据对应的唯一标识，请保存到产品数据库，方便排查问题

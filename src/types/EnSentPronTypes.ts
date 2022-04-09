@@ -4,6 +4,8 @@ import { ChivoxCoreType, ChivoxRequest } from "./ChivoxTypes";
  * 英文句子检错纠错 request。
  *
  * @see https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/en.sent.pron
+ *
+ * @deprecated 直接传对象即可，不再固定结构
  */
 export type ChivoxEnSentPronRequest = ChivoxRequest & {
   /** en.sent.pron表示英文句子检错纠错评测 */
@@ -52,8 +54,7 @@ export type ChivoxEnSentPronRequest = ChivoxRequest & {
           传参为正数，提高打分分数，传参越大提高的分数越多。
           传参为负数，降低打分分数，传参越小降低的分数越多。
        */
-      gop_adjust?: number
-    }
-  }
-
-}
+      gop_adjust?: number;
+    };
+  };
+};

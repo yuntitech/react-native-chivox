@@ -4,6 +4,8 @@ import { ChivoxCoreType, ChivoxRequest } from "./ChivoxTypes";
  * 英文句子内核 request。
  *
  * @see https://www.chivox.com/opendoc/#/ChineseDoc/coreEn/en.sent.score
+ * 
+ * @deprecated 直接传对象即可，不再固定结构
  */
 export type ChivoxEnSentScoreRequest = ChivoxRequest & {
   /** en.sent.score表示英文句子融合评测内核，自适应少儿、成人群体 */
