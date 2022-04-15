@@ -130,7 +130,7 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
   self.lastCategory = [[AVAudioSession sharedInstance] category];
   
   // fix: The recorder failed to turn on: AVAudioSession is AVAudioSessionCategoryPlayback
-  [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:nil];
+  [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];  
   
   // 开始评测
   e = [self.cloudengine start:recorder tokenId:tokenid param:options.mutableCopy listener:handler];
