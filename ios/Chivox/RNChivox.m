@@ -130,7 +130,7 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
   self.lastCategory = [[AVAudioSession sharedInstance] category];
   
   // fix: The recorder failed to turn on: AVAudioSession is AVAudioSessionCategoryPlayback
-  [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];  
+  [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:nil];
   
   // 开始评测
   e = [self.cloudengine start:recorder tokenId:tokenid param:options.mutableCopy listener:handler];
@@ -208,6 +208,7 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
 RCT_EXPORT_METHOD(stopChivoxRecord:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
   if (self.cloudengine == nil) {
+    [[AVAudioSession sharedInstance] setCategory:self.lastCategory error:nil];
     reject(@"0",@"stopChivoxRecord操作失败，cloudengine 为 nil", nil);
     return;
   }
@@ -215,6 +216,7 @@ RCT_EXPORT_METHOD(stopChivoxRecord:(RCTPromiseResolveBlock)resolve
   ChivoxAIRetValue * e  = nil;
   e = [self.cloudengine stop];
   if (0 != [e errId]){
+    [[AVAudioSession sharedInstance] setCategory:self.lastCategory error:nil];
     NSString *errMsg = [NSString stringWithFormat:@"stopChivoxRecord操作失败:%@", e.error];
     reject(@([e errId]).stringValue, errMsg, nil);
   } else {
@@ -228,6 +230,7 @@ RCT_EXPORT_METHOD(stopChivoxRecord:(RCTPromiseResolveBlock)resolve
 RCT_EXPORT_METHOD(cancelChivoxRecord:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
   if (self.cloudengine == nil) {
+    [[AVAudioSession sharedInstance] setCategory:self.lastCategory error:nil];
     reject(@"0",@"stopChivoxRecord操作失败", nil);
     return;
   }
