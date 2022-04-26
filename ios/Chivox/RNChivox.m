@@ -110,7 +110,7 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
   // 错误回调
   handler.onError = ^(NSString * _Nonnull eval, ChivoxAIEvalResult *_Nonnull result) {
     [[AVAudioSession sharedInstance] setCategory:self.lastCategory error:nil];
-    NSDictionary *body = @{ @"data":@"onError:----", @"success":@(false) };
+    NSDictionary *body = @{ @"data": [NSString stringWithFormat:@"onError -- %@", result.text], @"success":@(false) };
     [self sendEventWithName:ChivoxEventNotification body:body];
   };
   
