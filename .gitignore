@@ -1,5 +1,7 @@
 .history
 android/.gradle
+android/.idea
+android/local.properties
 ios/RNChivox.xcodeproj/xcuserdata/
 ios/RNChivox.xcodeproj/project.xcworkspace/xcuserdata/
 .DS_Store

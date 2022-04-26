@@ -137,6 +137,7 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
                             Log.e(TAG, "recordonError" + evalResult.text());
                             mEngine.cancel();
                             WritableMap event = Arguments.createMap();
+                            event.putString("data", evalResult.text());
                             event.putBoolean("success", false);
                             sendEvent(GET_CHIVOX_DATA_NOTIFICATION, event);
                         }
