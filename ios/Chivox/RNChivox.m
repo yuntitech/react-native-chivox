@@ -137,7 +137,8 @@ RCT_EXPORT_METHOD(startChivoxRecord:(nonnull NSDictionary *)options
   NSLog(@"%@",options);
   if (0 != [e errId]){
     [[AVAudioSession sharedInstance] setCategory:self.lastCategory error:nil];
-    reject(@([e errId]).stringValue,@"startChivoxRecord操作失败", nil);
+    NSString *errorResult = [NSString stringWithFormat:@"startChivoxRecord操作失败: %@", [e error]];
+    reject(@([e errId]).stringValue,errorResult, nil);
   } else {
     resolve(nil);
   }

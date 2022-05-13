@@ -172,7 +172,7 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
                         }
                     });
                     if (0 != ret.errId) {
-                        promise.reject(String.valueOf(ret.errId), "操作失败");
+                        promise.reject(String.valueOf(ret.errId), "startChivoxRecord操作失败" + ret.error);
                     } else {
                         promise.resolve(null);
                     }
