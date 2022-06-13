@@ -65,7 +65,7 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
     }
 
     @ReactMethod
-    public void initChivoxSdk(final String appKey, final String SecretKey) {
+    public void initChivoxSdk(final String appKey, final String SecretKey,Promise promise) {
         workerThread.execute(new Runnable() {
             @Override
             public void run() {
@@ -86,10 +86,12 @@ public class ChivoxModule extends ReactContextBaseJavaModule implements Lifecycl
                         public void onSuccess(Engine engine) {
                             mEngine = engine;
                             Log.e(TAG, "onSuccess");
+                            promise.resolve(null);
                         }
 
                         @Override
                         public void onFail(RetValue err) {
+                            promise.reject(err.errId+"",err.error);
                             Log.e(TAG, "err" + err.error);
                         }
                     });
