@@ -182,9 +182,12 @@ class ChivoxRecordUtil {
    * @param appKey
    * @param SecretKey
    */
-  public initChivoxSdk(appKey: string, SecretKey: string) {
-    ChivoxModule.initChivoxSdk(appKey, SecretKey);
-  }
+  public initChivoxSdk = async (
+    appKey: string,
+    SecretKey: string
+  ): Promise<void> => {
+    return ChivoxModule.initChivoxSdk(appKey, SecretKey);
+  };
 
   /**
    * 开始录音，并监听数据的回调

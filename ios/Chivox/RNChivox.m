@@ -47,7 +47,9 @@ RCT_EXPORT_MODULE(ChivoxModule)
 }
 
 RCT_EXPORT_METHOD(initChivoxSdk:(NSString *)appKey
-                  secretKey:(NSString *)secretKey) {
+                  secretKey:(NSString *)secretKey
+                  resolve:(RCTPromiseResolveBlock)resolve
+                  reject:(RCTPromiseRejectBlock)reject) {
   self.lastCategory = [[AVAudioSession sharedInstance] category];
   
   // 构建配置信息
@@ -75,7 +77,14 @@ RCT_EXPORT_METHOD(initChivoxSdk:(NSString *)appKey
   ChivoxAIEngineCreateCallback *cb = [ChivoxAIEngineCreateCallback
                                       onSuccess:^(ChivoxAIEngine * _Nonnull engine) {
     self.cloudengine = engine;
-  } onFail:^(ChivoxAIRetValue * _Nonnull err) {}];
+    resolve(nil);
+  } onFail:^(ChivoxAIRetValue * _Nonnull err) {
+    NSString *errorMessage = err.error;
+    if (errorMessage == nil) {
+      errorMessage = @"驰声SDK初始化失败";
+    }
+    reject(@([err errId]).stringValue, errorMessage, nil);
+  }];
   
   // 初始化
   [ChivoxAIEngine create:cfg cb:cb];
